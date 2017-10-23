@@ -1,5 +1,5 @@
 """
-    Fetches images from a URL and saves them in /bin.
+    Fetches images from a URL and saves them in /out.
 """
 import sys
 import os
@@ -41,7 +41,6 @@ class ImageParser(HTMLParser):
             f.close() # close the file
 
             self.image_count += 1 # increment the image count
-
 
 IP = ImageParser()
 IP.feed(str(page))
