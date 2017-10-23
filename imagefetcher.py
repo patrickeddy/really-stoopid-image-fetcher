@@ -6,8 +6,11 @@ import os
 import requests
 import re
 
-url = sys.argv[1] # get the website
-output_dir = sys.argv[2] if len(sys.argv) > 2 else "out"
+url = str(sys.argv[1]) # get the website
+output_dir = str(sys.argv[2]) if len(sys.argv) > 2 else "out"
+
+if ("http" not in url):
+    url = "http://" + url
 r = requests.get(url) # get the html
 page = r.content
 
@@ -36,13 +39,14 @@ class ImageParser(HTMLParser):
                 if (domain): # has domain
                     img_url = "http:" + img_url
                 else:
-                    img_url = "http:" + re.search("\/\/[\w+\.\w+]+\/", url).group(0) + img_url
+                    img_url = url + img_url
 
             print("img: " + str(img_url))
-            f = open(output_dir + "/image_" + str(self.image_count) + ".jpg", "wb") # save the image
-            img = requests.get(img_url).content # get raw data
-            f.write(img) # write the image data
-            f.close() # close the file
+            if img_url != "": # if image still not null after some parsing
+                f = open(output_dir + "/image_" + str(self.image_count) + ".jpg", "wb") # save the image
+                img = requests.get(img_url).content # get raw data
+                f.write(img) # write the image data
+                f.close() # close the file
 
             self.image_count += 1 # increment the image count
 
