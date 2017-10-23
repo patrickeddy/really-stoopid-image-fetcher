@@ -4,13 +4,15 @@
 import sys
 import os
 import requests
+import re
 
 url = sys.argv[1] # get the website
+output_dir = sys.argv[2] if len(sys.argv) > 2 else "out"
 r = requests.get(url) # get the html
 page = r.content
 
 # Check to see if there's an output directory
-os.makedirs("out/", exist_ok=True)
+os.makedirs(output_dir, exist_ok=True)
 
 from html.parser import HTMLParser
 
@@ -24,18 +26,20 @@ class ImageParser(HTMLParser):
         img_url = ""
         for (key, val) in attrs:
             if (key == 'src'):
+                print(val)
                 img_url = val # get the image url
 
         if img_url != "": # if the image isn't blank, write the file
-            spl = img_url.split("/")
-            if (spl[0] != 'http:' and spl[0] != "https:"): # no http protocol?
-                if ("." not in img_url.split("/")[0]): # no domain?
-                    img_url = url + img_url[1:] # remove that first slash
+            if ('http://' not in img_url and "https://" not in img_url): # no http protocol?
+                match = re.search("\/\/[\w+\.\w+]+\/", img_url)
+                domain = match.group(0) if match else None
+                if (domain): # has domain
+                    img_url = "http:" + img_url
                 else:
-                    img_url = "http://" + img_url
+                    img_url = "http:" + re.search("\/\/[\w+\.\w+]+\/", url).group(0) + img_url
 
             print("img: " + str(img_url))
-            f = open("out/image_" + str(self.image_count) + ".jpg", "wb") # save the image
+            f = open(output_dir + "/image_" + str(self.image_count) + ".jpg", "wb") # save the image
             img = requests.get(img_url).content # get raw data
             f.write(img) # write the image data
             f.close() # close the file
