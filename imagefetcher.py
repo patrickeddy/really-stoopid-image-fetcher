@@ -43,7 +43,11 @@ class ImageParser(HTMLParser):
 
             print("img: " + str(img_url))
             if img_url != "": # if image still not null after some parsing
-                f = open(output_dir + "/image_" + str(self.image_count) + ".jpg", "wb") # save the image
+                spl = img_url.split(".")
+                fext = str(spl[-1])
+                if (len(fext) != 3): fext = "jpg" # default to jpg
+
+                f = open(output_dir + "/image_" + str(self.image_count) + "." + fext, "wb") # save the image
                 img = requests.get(img_url).content # get raw data
                 f.write(img) # write the image data
                 f.close() # close the file
