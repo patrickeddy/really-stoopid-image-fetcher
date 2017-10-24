@@ -6,16 +6,13 @@ import os
 import requests
 import re
 
-url = str(sys.argv[1]) # get the website
-output_dir = str(sys.argv[2]) if len(sys.argv) > 2 else "out"
-
-if ("http" not in url):
-    url = "http://" + url
+photo_cat = sys.argv[1]
+url = "https://www.pexels.com/search/" + photo_cat
 r = requests.get(url) # get the html
 page = r.content
 
 # Check to see if there's an output directory
-os.makedirs(output_dir, exist_ok=True)
+os.makedirs(photo_cat, exist_ok=True)
 
 from html.parser import HTMLParser
 
@@ -49,7 +46,7 @@ class ImageParser(HTMLParser):
                 fext = str(spl[-1])
                 if (len(fext) != 3): fext = "jpg" # default to jpg
 
-                f = open(output_dir + "/" + img_name + "." + fext, "wb") # save the image
+                f = open(photo_cat + "/" + img_name + "." + fext, "wb") # save the image
                 img = requests.get(img_url).content # get raw data
                 f.write(img) # write the image data
                 f.close() # close the file
